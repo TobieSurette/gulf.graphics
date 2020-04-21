@@ -1,5 +1,7 @@
 #' Clear graphics
 #'
+#' @description Clears all graphics windows.
+#'
 #' @param x Graphic handle(s)
 #'
 #' @examples

@@ -1,8 +1,6 @@
 #' Draw horizontal or vertical lines
 #'
-#' These functions are used to draw hortizontal or vertical lines on an existing plot.
-#'
-#' @aliases hline vline
+#' @description These functions are used to draw hortizontal or vertical lines on an existing plot.
 #'
 #' @param x A numeric vector.
 #' @param lower A vector which defines the line(s)' lower plot range.
@@ -37,7 +35,7 @@ hline <- function(x, lower, upper, ...){
    }
 }
 
-#' @describeIn vline Draw vertical lines.
+#' @describeIn hline Draw vertical lines.
 vline <- function(x, lower, upper, ...){
    # Define default line bounds:
    if (missing(lower)) lower <- graphics::par("usr")[3]
