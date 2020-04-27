@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1587992543322.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E5CA024F",
+    "lastKnownWriteTime" : 1587982481,
+    "last_content_update" : 1587982481,
+    "path" : "~/Desktop/gulf.graphics/R/gbarplot.R",
+    "project_path" : "R/gbarplot.R",
+    "properties" : {
+        "cursorPosition" : "6,8",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

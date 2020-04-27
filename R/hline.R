@@ -9,12 +9,13 @@
 #'
 #' @examples
 #'   plot(c(0, 10), c(0, 10), type = "n")
-#'   hline(9, col = "red", lty = "dashed")
-#'   hline(1:5, col = "black", lty = "solid", lwd = 2)
-#'
+#'   hline(0, col = "red", lty = "solid")
+#'   vline(9, col = "red", lty = "dashed")
+#'   vline(1:5, col = "black", lty = "solid", lwd = 2)
+#'   
 #' @export hline
 #' @export vline
-
+#' 
 #' @describeIn hline Draw horizontal lines.
 hline <- function(x, lower, upper, ...){
    # Define default line bounds:

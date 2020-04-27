@@ -1,9 +1,10 @@
-#' Doug's Bar Plot
+#' Gulf Bar Plot
 #'
-#' This is Doug's alternative version of the \code{\link[graphics]{barplot}}
+#' @description This is Doug's alternative version of the \code{\link[graphics]{barplot}}
 #' function. Numeric \code{x} values may be passed directly for proper positioning along the
-#' X axis, allowing for easy overlaying over existing plots. If both positive and negative 'y'
-#' values are present, then the resulting stacked plot has bars separated above and below the X axis.
+#' X axis, allowing for easy overlay in existing plots. If both positive and negative 'y'
+#' values are present, then the resulting stacked plot has bars separated above and below the X
+#' axis.
 #'
 #' @param y A numeric vector, table, matrix or data frame object containing numeric values which are
 #'          to be displayed as a bar plot. Each row of the matrix will be plotted as a separate bar.
@@ -39,17 +40,17 @@
 #' y <- 10*rnorm(5)+5
 #'
 #' # Simple barplot:
-#' dbarplot(y)
+#' gbarplot(y)
 #'
 #' # Same barplot with explicit 'x':
-#' dbarplot(y, x = c(1, 2, 4, 5, 7))
+#' gbarplot(y, x = c(1, 2, 4, 5, 7))
 #'
 #' # Add explicit labels:
-#' dbarplot(y, x = c(1, 2, 4, 5, 7), labels = letters[1:5])
+#' gbarplot(y, x = c(1, 2, 4, 5, 7), labels = letters[1:5])
 #'
 #' # Display bar plot:
 #' y <- data.frame("Variable 1" = c(1, -2, NA, -4, 5), "Variable 2" = 1:5)
-#' dbarplot(y, xlab = "Order", ylab = "y",
+#' gbarplot(y, xlab = "Order", ylab = "y",
 #'          labels = c("First", "Second", "Third", "Fourth", "Fifth"))
 #'
 #' # Bar plot of lobster length-frequencies by sex:
@@ -58,18 +59,18 @@
 #' f <- as.data.frame(f[2:dim(f)[1], 1:2])
 #' f[, 1] <- -f[, 1]  # Reverse sign of male frequencies.
 #' names(f) <- sex.str(1:2) # Assign sex labels.
-#' dbarplot(f)
+#' gbarplot(f)
 #'
 #' # Display a frequency table overlayed by the true distribution:
 #' y <- table(round(rnorm(250, sd = 5)))
-#' dbarplot(y, col = "grey")
+#' gbarplot(y, col = "grey")
 #' x <- seq(-15, 15, len = 100)
 #' lines(x, 250 * dnorm(x, sd = 5), col = "red", lwd = 2)
 #'
-#' @export dbarplot
+#' @export gbarplot
 #'
 
-dbarplot <- function(y, x = NULL, labels = NULL, width = 0.8,
+gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8,
                      col = NULL, border = par("fg"), add = FALSE,
                      yaxs = ifelse(all(y[!is.na(y)] <= 0)|all(y[!is.na(y)] >= 0), "i", "r"),
                      legend = TRUE, ...){
