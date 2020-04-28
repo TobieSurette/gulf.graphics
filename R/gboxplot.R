@@ -18,11 +18,9 @@
 #' x <- matrix(runif(100), ncol = 4)
 #' excel(x, header = FALSE)
 #'
-#' @export excel
-#' @export excel.default
-#' @export excel.data.frame
+#' @export gboxplot
 #'
-dboxplot <- function(y, x, labels, width = 0.5, xlab = "", ylab = "", alpha = 0.05,
+gboxplot <- function(y, x, labels, width = 0.5, xlab = "", ylab = "", alpha = 0.05,
                      lwd = 1, col = "black", bg = "white", ...){
 
     # Check input arguments:

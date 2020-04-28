@@ -47,7 +47,7 @@ The legend entries are taken from the columns names of \code{y}.}
 \item{\dots}{Further arguments to be passed onto the \code{\link[graphics]{plot}} function.}
 }
 \description{
-This is Doug's alternative version of the \code{\link[graphics]{barplot}}
+Doug's alternative version of the \code{\link[graphics]{barplot}}
 function. Numeric \code{x} values may be passed directly for proper positioning along the
 X axis, allowing for easy overlay in existing plots. If both positive and negative 'y'
 values are present, then the resulting stacked plot has bars separated above and below the X
