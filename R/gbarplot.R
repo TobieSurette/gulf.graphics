@@ -71,13 +71,12 @@ gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8,
    if (is.table(y)){
       y <- as.matrix(y)
       class(y) <- "matrix"
+      if (nrow(y) == 1) y <- t(y)
       x <- as.numeric(rownames(y))
       if (any(is.na(x))) x <- NULL
    }
-   if (!is.data.frame(y)){
-      y <- as.data.frame(y)
-   }
-   if (dim(y)[1] == 1) y <- t(y)
+   if (!is.data.frame(y)) y <- as.data.frame(y)
+   if (nrow(y) == 1) y <- t(y)
 
    # Define 'col' argument:
    if ((length(col) != dim(y)[1]) & (length(col) != dim(y)[2])){
@@ -98,9 +97,7 @@ gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8,
    }
 
    # Define 'labels' as an integer sequence if undefined:
-   if (is.null(labels)){
-      if (!is.null(x)) labels <- as.character(x) else labels <- rownames(y)
-   }
+   if (is.null(labels)) if (!is.null(x)) labels <- as.character(x) else labels <- rownames(y)
 
    # If 'x' is a character vector, define 'labels' as 'x':
    if (is.character(x)){
@@ -142,7 +139,8 @@ gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8,
 
    # Plot figure title:
    title(...)
-
+ 
+   
    # Loop over each bar:
    for (i in 1:length(x)){
       y.lower <- 0
