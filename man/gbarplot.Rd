@@ -72,18 +72,13 @@ y <- data.frame("Variable 1" = c(1, -2, NA, -4, 5), "Variable 2" = 1:5)
 gbarplot(y, xlab = "Order", ylab = "y",
          labels = c("First", "Second", "Third", "Fourth", "Fifth"))
 
-# Bar plot of lobster length-frequencies by sex:
-x <- read.gulf(year = 2000, species = 2550, card = "len")
-f <- t(freq(x, by = "sex"))
-f <- as.data.frame(f[2:dim(f)[1], 1:2])
-f[, 1] <- -f[, 1]  # Reverse sign of male frequencies.
-names(f) <- sex.str(1:2) # Assign sex labels.
-gbarplot(f)
-
 # Display a frequency table overlayed by the true distribution:
 y <- table(round(rnorm(250, sd = 5)))
-gbarplot(y, col = "grey")
+gbarplot(y, col = "grey", width = 1)
 x <- seq(-15, 15, len = 100)
 lines(x, 250 * dnorm(x, sd = 5), col = "red", lwd = 2)
 
+}
+\seealso{
+\code{\link{error.bar}}
 }
