@@ -2,7 +2,7 @@ draw.points <- function(x = NULL, y = NULL, n = NULL, tol = 5E-3, snap = FALSE,
                         snap.to.grid = FALSE, snap.to.line = FALSE, grid.increment,
                         grid.offset = 0, pch = 21, bg = "black", ...){
    # DRAW.POINTS - Draw a points interactively on a plot.
-   
+
    # Points supplied by user:
    flag <- FALSE
    if (!missing(x) & !missing(y)){
@@ -12,7 +12,7 @@ draw.points <- function(x = NULL, y = NULL, n = NULL, tol = 5E-3, snap = FALSE,
 
    # Set tolerance flag default:
    tolerance.flag <- TRUE
-   
+
    # Create default plot:
    if (is.null(dev.list()) & !flag) plot(c(0, 1), c(0, 1), type = "n", xlab = "", ylab = "")
    if (is.null(dev.list()) & flag)  plot(x, y, xlab = "", ylab = "")
@@ -63,10 +63,10 @@ draw.points <- function(x = NULL, y = NULL, n = NULL, tol = 5E-3, snap = FALSE,
          if (tolerance.flag) cat("   Tolerance is ON.\n") else cat("   Tolerance is OFF.\n")
       }
       if (key == "ctrl-[") return(data.frame(x = xx, y = yy))
-      
+
       return(NULL)
    }
-   
+
    # Mouse plotting function:
    plot.point <- function(buttons, x0, y0){
       if (any(1:2 %in% buttons)) return(4)
@@ -101,13 +101,13 @@ draw.points <- function(x = NULL, y = NULL, n = NULL, tol = 5E-3, snap = FALSE,
             yy[length(xx)] <<- res$y
          }
       }
-      
+
       # Snap point to grid:
       if (snap.to.grid){
          xx[length(xx)] <<- round((xx[length(xx)] + grid.offset) / grid.increment) * grid.increment - grid.offset
          yy[length(yy)] <<- round((yy[length(xx)] + grid.offset) / grid.increment) * grid.increment - grid.offset
       }
-      
+
       # Remove last point if it was identical to the previous point:
       if (length(xx) >= 2){
          if ((xx[length(xx)] == xx[length(xx)-1]) & (yy[length(xx)] == yy[length(xx)-1])){
@@ -115,13 +115,13 @@ draw.points <- function(x = NULL, y = NULL, n = NULL, tol = 5E-3, snap = FALSE,
             yy <<- yy[-length(yy)]
          }
       }
-      
+
       # Draw points:
       points(xx[length(xx)], yy[length(yy)], pch = pch, bg = bg, ...)
-       
+
       # Check if length of vector exceeds 'n':
       if (!is.null(n)) if (length(xx) >= n) return(data.frame(x = xx, y = yy))
-      
+
       return(NULL)
    }
 
