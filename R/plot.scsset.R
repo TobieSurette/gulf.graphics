@@ -13,7 +13,6 @@
 #' plot(x[1, ])
 
 
-
 #' @export plot.scsset
 #' @export
 plot.scsset <- function(x, tow.id, year, ...){
@@ -23,7 +22,7 @@ plot.scsset <- function(x, tow.id, year, ...){
       x <- read.scsset(year = 2020, tow.id = tow.id)
    }
 
-   # Date labelling function:
+   # Date labeling function:
    suffix <- function(n){
       suffixes <- c("th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th")
       if (n %in% 11:20) return("th")
@@ -41,24 +40,30 @@ plot.scsset <- function(x, tow.id, year, ...){
       # Read probe data:
       m <- NULL
       e <- read.esonar(x)
-      s <- read.star.oddi(x, probe = "headline")
-      t <- read.star.oddi(x, probe = "footrope")
+      s <- read.star.oddi(x, probe = "headline", project = "scs")
+      t <- read.star.oddi(x, probe = "footrope", project = "scs")
 
       # Define reference time:
-      reftime <- start.time(x)
+      reftime <- time(x, "touchdown")
 
       # Define set of event times:
-      events <- c(0, gulf.utils::time2min(end.time(x), start.time(x)))
-      names(events) <- c("start", "stop")
+      events <- c(start = gulf.utils::time(x, "start"), 
+                  stop = gulf.utils::time(x, "end"),
+                  haul = gulf.utils::time(x, "haul"),
+                  touchdown = gulf.utils::time(x, "touchdown"),
+                  liftoff = gulf.utils::time(x, "liftoff"))
+      str <- names(events)
+      events <- gulf.utils::time2min(events, events[["start"]])
+      names(events) <- str    
 
       # Define time axes range:
       xlim <- c(min(events) - 0.2 * diff(range(events)), max(events) + 0.2 * diff(range(events)))
 
       # Define time in minutes from reference start time:
       if (!is.null(m)) m$time <- gulf.utils::time2min(time(m), reftime)
-      if (!is.null(e)) e$time <- gulf.utils::time2min(time(e), reftime)
-      if (!is.null(s)) s$time <- gulf.utils::time2min(time(s), reftime)
-      if (!is.null(t)) t$time <- gulf.utils::time2min(time(t), reftime)
+      if (!is.null(e)) e$time <- gulf.utils::time2min(gulf.utils::time(e), reftime)
+      if (!is.null(s)) s$time <- gulf.utils::time2min(gulf.utils::time(s), reftime)
+      if (!is.null(t)) t$time <- gulf.utils::time2min(gulf.utils::time(t), reftime)
 
       # Convert pressures to depth:
       index <- which(!is.na(e$depth) & e$time >= events["start"] & e$time <= events["stop"])
@@ -66,11 +71,11 @@ plot.scsset <- function(x, tow.id, year, ...){
       if (!is.null(t)) t$depth <- t$pressure * mean(e$depth[index] / approx(t$time, t$pressure, e$time[index])$y)
 
       # Define graphical layout:
-      M <- rbind(t(kronecker(1:3, matrix(1, nrow = 5, ncol = 5))),
+      L <- rbind(t(kronecker(1:3, matrix(1, nrow = 5, ncol = 5))),
                  0,
                  kronecker(4:7, matrix(1, nrow = 5, ncol = 15)))
-      M <- rbind(0, cbind(0, 0, M, 0), 0, 0)
-      layout(M)
+      L <- rbind(0, cbind(0, 0, L, 0), 0, 0)
+      layout(L)
 
       # Display catch photo:
       photo <- gulf.utils::locate(keywords = c(year, "photos"), pattern = paste0(x$tow.id, ".jpg"))
@@ -79,8 +84,10 @@ plot.scsset <- function(x, tow.id, year, ...){
          par(mar = c(0, 0, 0, 0))
          photo <- photo[seq(1, nrow(photo), by = 10), seq(1, ncol(photo), by = 10), ]  # Thin-out image.
          plot(c(0, 1), c(0, 1), type = "n", xlab = "", xaxt = "n", ylab = "", yaxt = "n", xaxs = "i", yaxs = "i")
-         rasterImage(photo, 0, 0, 1, 1)
+         graphics::rasterImage(photo, 0, 0, 1, 1)
          box()
+      }else{
+         plot(c(0, 1), c(0, 1), type = "n", xaxt = "n", yaxt = "n")
       }
 
       # Display tow location on sGSL map:
@@ -95,12 +102,26 @@ plot.scsset <- function(x, tow.id, year, ...){
       mtext(title, 3, 1.5, at = par("usr")[1] + 0.5*diff(par("usr")[1:2]), cex = 1.5, font = 2)
 
       # Display vessel track:
-      index <- (e$time >= events["start"]) & (e$time <= events["stop"])
-      xy <- 1000 * deg2km(lon(e)[index], lat(e)[index])
-      xy[,1] <- xy[,1] - xy[1,1]
-      xy[,2] <- xy[,2] - xy[1,2]
-      plot(xy, pch = 21, type = "l", col = "grey", lwd = 2)
-      grid()
+      if (!is.null(e)){
+         xy <- 1000 * gulf.spatial::deg2km(gulf.spatial::lon(e), gulf.spatial::lat(e))
+         xy[,1] <- xy[,1] - xy[which(e$time == 0),1]
+         xy[,2] <- xy[,2] - xy[which(e$time == 0),2]
+         index <- (e$time >= events["touchdown"]) & (e$time <= events["liftoff"])
+         dx <- range(xy[index,1])
+         dy <- range(xy[index,2])
+         if (diff(dx) > diff(dy)){
+            dy[2] <- dy[1] + diff(dx)
+         }else{
+            dx[2] <- dx[1] + diff(dy)
+         } 
+      
+         plot(dx, dy, type = "n", xaxs = "i", yaxs = "i")
+         index <- (e$time >= events["touchdown"]) & (e$time <= events["stop"])
+         lines(xy[index, 1], xy[index, 2], col = "grey", lwd = 2)
+         index <- (e$time >= events["stop"]) & (e$time <= events["liftoff"])
+         lines(xy[index, 1], xy[index, 2], col = "red", lwd = 2)
+      
+      }
 
       # Vessel speed:
       plot(e$time, e$speed, xlim = xlim, ylim = c(0, 4), type = "l", lwd = 2, xaxs = "i", yaxs = "i")
