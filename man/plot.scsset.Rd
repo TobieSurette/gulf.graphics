@@ -4,14 +4,31 @@
 \alias{plot.scsset}
 \title{Plot Snow Crab Trawl Data}
 \usage{
-\method{plot}{scsset}(x, tow.id, year, ...)
+\method{plot}{scsset}(
+  x,
+  tow.id,
+  year,
+  pdf = FALSE,
+  path = getwd(),
+  temperature = FALSE,
+  headline = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{\code{scsset} data object.}
 
 \item{tow.id}{Character string specifying a tow identifier.}
 
-\item{year}{Survey year}
+\item{year}{Survey year.}
+
+\item{pdf}{Logical values specifying whether to output the figure to a pdf file.}
+
+\item{path}{Path to which output file is to written.}
+
+\item{temperature}{Logical values specifying whether to include temperature profile.}
+
+\item{headline}{Logical values specifying whether to include trawl headline height profile.}
 }
 \description{
 Displays auxiliary trawl data from the snow crab trawl survey.

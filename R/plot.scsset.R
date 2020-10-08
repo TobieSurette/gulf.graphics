@@ -7,7 +7,11 @@
 #' @param year Survey year.
 #' @param pdf Logical values specifying whether to output the figure to a pdf file.
 #' @param path Path to which output file is to written.
-#'
+#' @param temperature Logical values specifying whether to include temperature profile.
+#' @param headline Logical values specifying whether to include trawl headline height measurements.
+#' @param wingspread Logical values specifying whether to include trawl wing spread measurements.
+#' @param tilt Logical values specifying whether to include tilt probe angles.
+#'  
 #' @examples
 #' plot.scsset(year = 2020, tow.id = "GP354F")
 #'
@@ -17,16 +21,17 @@
 
 #' @export plot.scsset
 #' @export
-plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), ...){
+plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperature = FALSE, headline = TRUE, 
+                        wingspread = TRUE, tilt = TRUE, ...){
    # 1 - Photo and maps (compare vessel and trawl footrope probe heading)
-   #2 - Vessel speed
-   #3 - Depth profiles
-   #4 - Wingspread profiles
-   #5 - Headline height
-   #6 - Temperature profiles
-   #7 - Tilt profiles
-   #8 - Compass heading, vessel heading, probe inclination
-   #9 - Accelerometer profiles
+   # 2 - Vessel speed
+   # 3 - Depth profiles
+   # 4 - Wingspread profiles
+   # 5 - Headline height
+   # 6 - Temperature profiles
+   # 7 - Tilt profiles
+   # 8 - Compass heading, vessel heading, probe inclination
+   # 9 - Accelerometer profiles
    
    # Load tow data:
    if (missing(x)){
@@ -43,7 +48,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), ...){
    }
 
    # Plot multiple tows:
-   if (nrow(x) > 1) for (i in 1:nrow(x)) plot(x[i, ], pdf = pdf, path = path, ...)
+   if (nrow(x) > 1) for (i in 1:nrow(x)) plot(x[i, ], ...)
 
    # Plot single tows:
    if (nrow(x) == 1){
@@ -90,9 +95,23 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), ...){
 
       # Convert pressures to depth:
       depth <- gulf.spatial::depth(gulf.spatial::lon(x), gulf.spatial::lat(x))
-      if (!is.null(e)) e$depth <- depth * e$depth / mean(e$depth[which(e$time >= 0 & (e$time <= events["stop"]))], na.rm = TRUE)  
-      if (!is.null(s)) s$depth <- depth * s$pressure / mean(s$pressure[s$time >= 0 & s$time <= events["stop"]]) 
-      if (!is.null(t)) t$depth <- depth * t$pressure / mean(t$pressure[t$time >= 0 & t$time <= events["stop"]]) 
+      if (!is.null(e)){
+         index <- which((e$time >= -3) & (e$time <= (events["liftoff"] + 3)) & !is.na(e$depth))
+         if (length(index) > 10){
+            if (!is.null(s)){
+               y <- approx(s$time, s$pressure, e$time[index])$y 
+               model <- lm(e$depth[index] ~ y)
+               s$depth <- predict(model, newdata = list(y = s$pressure))
+            }
+            if (!is.null(t)){
+               y <- approx(t$time, t$pressure, e$time[index])$y 
+               model <- lm(e$depth[index] ~ y)
+               t$depth <- predict(model, newdata = list(y = t$pressure))
+            }            
+         }
+      }
+      if (!is.null(s)) if (is.null(s$depth)) s$depth <- depth * s$pressure / mean(s$pressure[s$time >= 0 & s$time <= events["stop"]]) 
+      if (!is.null(t)) if (is.null(t$depth)) t$depth <- depth * t$pressure / mean(t$pressure[t$time >= 0 & t$time <= events["stop"]]) 
       
       # Create new graphics device:
       if (pdf){
@@ -102,9 +121,23 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), ...){
          dev.new(width = 8.5, height = 11)
       }
       
+      # Plot inventory:
+      if (is.null(e)){
+         wingspread <- FALSE
+         headline <- FALSE
+      }
+      if (is.null(s) & is.null(t)) temperature <- FALSE
+      if (is.null(t)) tilt <- FALSE
+      
       # Define graphical layout:
+      nfigs <- 9
+      if (!temperature) nfigs <- nfigs - 1
+      if (!headline)    nfigs <- nfigs - 1
+      if (!wingspread)  nfigs <- nfigs - 1
+      if (!tilt)        nfigs <- nfigs - 1
+      
       L <- rbind(0, t(kronecker(1:3, matrix(1, nrow = 5, ncol = 8))), 0, 0,  
-                 kronecker(4:9, matrix(1, nrow = 4, ncol = 15)))
+                 kronecker(4:nfigs, matrix(1, nrow = 13-nfigs, ncol = 15)))
       L <- rbind(0, 0, cbind(0, 0, L, 0), 0, 0, 0)      
       layout(L)
 
@@ -127,11 +160,11 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), ...){
       }
 
       # Display tow location on sGSL map:
-      #plot(c(0, 1), c(0, 1), type = "n", xaxt = "n", yaxt = "n")
       par(mar = c(1,0,0,2))
-      map <- read.csv(locate(package = "gulf.spatial", keywords  = "gulf.coast.h"), header = TRUE, stringsAsFactors = FALSE)
-      plot(c(-66.5, -60), c(45, 49), type = "n", cex.axis = 0.75, mgp = c(2, 0.5, 0), xaxs = "i", yaxs = "i")
-      graphics::polygon(map, col = "grey80")
+      plot(c(-66.5, -60), c(45.25, 49.25), type = "n", xlab = "", ylab = "",
+           cex.axis = 0.75, mgp = c(2, 0.5, 0), xaxs = "i", yaxs = "i")
+      grid()
+      coast("i")
       points(gulf.spatial::lon(x), gulf.spatial::lat(x), pch = 21, bg = "tomato2", cex = 1.25)
       box()
       
@@ -146,8 +179,13 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), ...){
       if (!is.null(e)){
          # Vessel track:
          xy <- 1000 * gulf.spatial::deg2km(gulf.spatial::lon(e), gulf.spatial::lat(e))
-         xy[,1] <- xy[,1] - xy[which(e$time == 0),1]
-         xy[,2] <- xy[,2] - xy[which(e$time == 0),2]
+         if (length(which(e$time == 0)) > 0){
+            xy[,1] <- xy[,1] - xy[which(e$time == 0),1]
+            xy[,2] <- xy[,2] - xy[which(e$time == 0),2]
+         }else{
+            xy[,1] <- xy[,1] - xy[1,1]
+            xy[,2] <- xy[,2] - xy[1,2]   
+         }
          index <- (e$time >= events["touchdown"]) & (e$time <= events["liftoff"])
          dx <- range(xy[index,1])
          dy <- range(xy[index,2])
@@ -171,57 +209,70 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), ...){
          lines(xy[index, 1], xy[index, 2], col = "tomato2", lwd = 2)
          mtext("x(meters)", 1, 1.5, cex = 0.8)
          mtext("y(meters)", 2, 1.5, cex = 0.8)
-         points(0,0,pch = 21, bg = "grey")
-         text(0,0,"touchdown")
+         points(0, 0, pch = 24, bg = "darkolivegreen3")
          index <- which.min(abs(e$time - events["stop"]))
-         points(xy[index,1], xy[index,2], pch = 21, bg = "grey")
-         #text(xy[index,1], xy[index,2], "stop")
-         index <- which.min(abs(e$time - events["liftoff"]))
          points(xy[index,1], xy[index,2], pch = 21, bg = "tomato2")
+         index <- which.min(abs(e$time - events["liftoff"]))
+         points(xy[index,1], xy[index,2], pch = 4, lwd = 2, col = "black")
+         legend("topleft", 
+                legend = c("touchdown", "stop", "liftoff"),
+                pch = c(24, 21, 4),
+                col = "black", pt.bg = c("darkolivegreen3", "tomato2", NA),
+                pt.lwd = c(1,1,2), cex = 0.5)
+      }
+      
+      # Set zero margins:
+      par(mar = c(0,0,0,0))
          
-         par(mar = c(0,0,0,0))
-         
-         # Vessel speed:
-         plot(xlim, c(0, 4), type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n")
-         background(xlim, events)
-         lines(e$time, e$speed, lwd = 2, col = "grey")
-         mtext("Speed(knots)", 2, 2.25, cex  = 0.65)
-         box()
+      # Vessel speed:
+      plot(xlim, c(0, 4), type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n")
+      background(xlim, events)
+      if (!is.null(e)) lines(e$time, e$speed, lwd = 2, col = "grey")
+      mtext("Speed(knots)", 2, 2.25, cex  = 0.65)
+      box()
    
-         # Label trawling phases:
-         msg <- c("Descent", "Active Trawling", "Passive", "Ascent")
-         at <- c((xlim[1]+events["touchdown"])/2, (events["touchdown"]+ events["stop"])/2,
-                 (events["stop"]+ events["liftoff"])/2, (events["liftoff"]+ xlim[2])/2)
-         mtext(msg, 3, 0.5, at = at)
+      # Label trawling phases:
+      msg <- c("Descent", "Active Trawling", "Passive", "Ascent")
+      at <- c((xlim[1]+events["touchdown"])/2, (events["touchdown"]+ events["stop"])/2,
+              (events["stop"]+ events["liftoff"])/2, (events["liftoff"]+ xlim[2])/2)
+      mtext(msg, 3, 0.5, at = at)
             
-         # Wing spread:
+      # Wing spread:
+      if (wingspread){
          plot(xlim, c(0, 14), type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n", yaxt = "n")
          background(xlim, events)
          points(e$time, wingspread(e), pch = 21, bg = "grey")
          mtext("Wing spread(m)", 2, 2.25, cex  = 0.65)
          axis(2, at = seq(0, 12, by = 2))
          box()
-
-         # Headline height:
-         plot(xlim, c(0, 4), type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n", yaxt = "n")
+      }
+      
+      # Headline height:
+      if (headline){
+         plot(xlim, c(0, 3), type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n", yaxt = "n")
          background(xlim, events)
          points(e$time, e$headline, pch = 21, bg = "grey")
          mtext("Headline height(m)", 2, 2.25, cex = 0.65)
-         axis(2, at = seq(0, 3.5, by = 0.5))
+         axis(2, at = seq(0, 2.5, by = 0.5))
          box()
       }
-            
+      
       # Depth profiles:
-      ylim <- c(-depth - 5, -depth +25)
+      depth <- NULL
+      if (is.null(depth)) if (!is.null(s)) depth <- max(s$depth[s$time >= 0 & s$time <= events["liftoff"]], na.rm = TRUE)
+      if (is.null(depth)) if (!is.null(t)) depth <- max(t$depth[t$time >= 0 & t$time <= events["liftoff"]], na.rm = TRUE)   
+      if (is.null(depth)) if (!is.null(e)) depth <- mean(e$depth[t$time >= 0 & e$time <= events["liftoff"]], na.rm = TRUE) 
+      if (is.null(depth)) if (!is.null(e)) depth <- gulf.spatial::depth(gulf.spatial::lon(x), gulf.spatial::lat(x))   
+      ylim <- c(-depth - 10, -depth + 30)
       ylim <- c(floor(ylim[1] / 5) * 5, floor((ylim[2] / 5)+1)* 5)
       plot(xlim, ylim, type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n", yaxt = "n")
       background(xlim, events)
-      lines(s$time, -s$depth, lwd = 2, col = "tomato2")
-      lines(t$time, -t$depth, lwd = 2, col = "skyblue3")
-      points(e$time, -e$depth, pch = 21, bg = "darkolivegreen3")
+      if (!is.null(s)) lines(s$time, -s$depth, lwd = 2, col = "tomato2")
+      if (!is.null(t)) lines(t$time, -t$depth, lwd = 2, col = "skyblue3")
+      if (!is.null(e)) points(e$time, -e$depth, pch = 21, bg = "darkolivegreen3")
       mtext("Depth(m)", 2, 2.25, cex  = 0.7)
       at <- pretty(ylim)
-      axis(2, at = at[-length(at)])
+      axis(2, at = at[-length(at)], labels = abs(at[-length(at)]))
       box()
       legend("bottomright",
              legend = c("eSonar", "headline", "footrope"), pch = c(21, NA, NA),
@@ -230,36 +281,39 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), ...){
              bg = "white", cex = 0.8)
       
       # Temperature profiles:
-      index <- (s$time >= events["touchdown"]) & (s$time <= events["liftoff"])
-      ylim <- c(min(s$temperature[index], na.rm = TRUE), max(s$temperature[index], na.rm = TRUE))
-      ylim <- c(floor(ylim[1] * 4) / 4, (floor(ylim[2] * 4)+1) / 4)
-      plot(xlim, ylim, type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n")
-      background(xlim, events)
-      lines(s$time, s$temperature, lwd = 2, col = "tomato2")
-      #lines(t$time, t$temperature, lwd = 2, col = "blue")
-      mtext("Temperature(ºC)", 2, 2.25, cex  = 0.7)
-      msg <- round(mean(s$temperature[(s$time >= (events["stop"]-2)) & (s$time <= events["stop"])], na.rm = TRUE), 2)
-      msg <- paste0("Bottom temp. = ", msg,  "ºC") 
-      text((events["touchdown"] + events["stop"])/2, par("usr")[3] + 0.85 * diff(par("usr")[3:4]), msg)
-      box()
-
-      # Tilt angle plot:
-      index <- t$time >= xlim[1] & t$time <= xlim[2]
-      ylim <- range(t[index, c("tilt-x", "tilt-y", "tilt-z")], na.rm = TRUE)
-      ylim <- c(floor(ylim[1] / 10) * 10, (floor(ylim[2] / 10)+1) * 10)
-      plot(xlim, ylim, type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n")
-      background(xlim, events)
-      lines(t$time, t$"tilt-z", col = "darkolivegreen3", lwd = 1.5)
-      lines(t$time, t$"tilt-y", col = "tomato2", lwd = 1.5)
-      lines(t$time, t$"tilt-x", col = "skyblue3", lwd = 1.5)
-      mtext("Tilt angle(º)", 2, 2.25, cex  = 0.7)
-      box()
-      legend("topright",
-             legend = c("X", "Y", "Z"),
-             col = c("skyblue3", "tomato2", "darkolivegreen3"), lwd = 1.5,
-             bg = "white", cex = 0.8)
-      axis(1)
-      mtext("Time(min)", 1, 2.5, cex = 1.25)
+      if (temperature){
+         index <- (s$time >= events["touchdown"]) & (s$time <= events["liftoff"])
+         ylim <- c(min(s$temperature[index], na.rm = TRUE), max(s$temperature[index], na.rm = TRUE))
+         ylim <- c(floor(ylim[1] * 4) / 4, (floor(ylim[2] * 4)+1) / 4)
+         plot(xlim, ylim, type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n")
+         background(xlim, events)
+         lines(s$time, s$temperature, lwd = 2, col = "tomato2")
+         mtext("Temperature(ºC)", 2, 2.25, cex  = 0.7)
+         msg <- round(mean(s$temperature[(s$time >= (events["stop"]-2)) & (s$time <= events["stop"])], na.rm = TRUE), 2)
+         msg <- paste0("Bottom temp. = ", msg,  "ºC") 
+         text((events["touchdown"] + events["stop"])/2, par("usr")[3] + 0.85 * diff(par("usr")[3:4]), msg)
+         box()
+      }
+      
+      if (tilt){
+         # Tilt angle plot:
+         index <- t$time >= xlim[1] & t$time <= xlim[2]
+         ylim <- range(t[index, c("tilt-x", "tilt-y", "tilt-z")], na.rm = TRUE)
+         ylim <- c(floor(ylim[1] / 10) * 10, (floor(ylim[2] / 10)+1) * 10)
+         plot(xlim, ylim, type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n")
+         background(xlim, events)
+         lines(t$time, t$"tilt-z", col = "darkolivegreen3", lwd = 1.5)
+         lines(t$time, t$"tilt-y", col = "tomato2", lwd = 1.5)
+         lines(t$time, t$"tilt-x", col = "skyblue3", lwd = 1.5)
+         mtext("Tilt angle(º)", 2, 2.25, cex  = 0.7)
+         box()
+         legend("topright",
+                legend = c("X", "Y", "Z"),
+                col = c("skyblue3", "tomato2", "darkolivegreen3"), lwd = 1.5,
+                bg = "white", cex = 0.8)
+         axis(1)
+         mtext("Time(min)", 1, 2.5, cex = 1.25)
+      }
       
       if (pdf) dev.off()
    }
