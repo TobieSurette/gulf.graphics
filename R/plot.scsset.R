@@ -42,6 +42,10 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), ...){
       return("")
    }
 
+   # Plot multiple tows:
+   if (nrow(x) > 1) for (i in 1:nrow(x)) plot(x[i, ], pdf = pdf, path = path, ...)
+
+   # Plot single tows:
    if (nrow(x) == 1){
       # Define year:
       year <- unique(gulf.utils::year(x))
