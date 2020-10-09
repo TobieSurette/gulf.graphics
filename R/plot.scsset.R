@@ -18,7 +18,6 @@
 #' x <- read.scsset(year = 2020)
 #' plot(x[1, ])
 
-
 #' @export plot.scsset
 #' @export
 plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperature = FALSE, headline = TRUE, 
@@ -218,7 +217,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
                 legend = c("touchdown", "stop", "liftoff"),
                 pch = c(24, 21, 4),
                 col = "black", pt.bg = c("darkolivegreen3", "tomato2", NA),
-                pt.lwd = c(1,1,2), cex = 0.5)
+                pt.lwd = c(1,1,2), cex = 1.0)
       }
       
       # Set zero margins:
