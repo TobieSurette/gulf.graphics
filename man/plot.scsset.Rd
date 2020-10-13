@@ -12,6 +12,8 @@
   path = getwd(),
   temperature = FALSE,
   headline = TRUE,
+  wingspread = TRUE,
+  tilt = TRUE,
   ...
 )
 }
@@ -28,7 +30,11 @@
 
 \item{temperature}{Logical values specifying whether to include temperature profile.}
 
-\item{headline}{Logical values specifying whether to include trawl headline height profile.}
+\item{headline}{Logical values specifying whether to include trawl headline height measurements.}
+
+\item{wingspread}{Logical values specifying whether to include trawl wing spread measurements.}
+
+\item{tilt}{Logical values specifying whether to include tilt probe angles.}
 }
 \description{
 Displays auxiliary trawl data from the snow crab trawl survey.

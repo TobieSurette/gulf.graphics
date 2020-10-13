@@ -61,7 +61,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       t <- read.star.oddi(x, probe = "footrope", project = "scs")
 
       # Define reference time:
-      reftime <- time(x, "touchdown")
+      reftime <- gulf.utils::time(x, "touchdown")
 
       # Define set of event times:
       events <- c(start = gulf.utils::time(x, "start"), 
@@ -73,7 +73,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
 
       # Define time axes range:
       dt <- diff(range(events[c("start", "liftoff")]))
-      xlim <- c(events[["start"]] - 0.2 * dt, events[["liftoff"]] + 0.2 * dt)
+      xlim <- c(min(events[c("start", "touchdown")]) - 0.2 * dt, events[["liftoff"]] + 0.2 * dt)
 
       background <- function(xlim, events){
          col <- colorRamp(c("white", "tomato2"))(0.25) / 255
@@ -99,19 +99,25 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
          if (length(index) > 10){
             if (!is.null(s)){
                y <- approx(s$time, s$pressure, e$time[index])$y 
-               model <- lm(e$depth[index] ~ y)
-               s$depth <- predict(model, newdata = list(y = s$pressure))
+               if (!all(is.na(y))){
+                  model <- lm(e$depth[index] ~ y)
+                  s$depth <- predict(model, newdata = list(y = s$pressure))
+               }
             }
             if (!is.null(t)){
                y <- approx(t$time, t$pressure, e$time[index])$y 
-               model <- lm(e$depth[index] ~ y)
-               t$depth <- predict(model, newdata = list(y = t$pressure))
+               if (!all(is.na(y))){
+                  model <- lm(e$depth[index] ~ y)
+                  t$depth <- predict(model, newdata = list(y = t$pressure))
+               }
             }            
          }
       }
       if (!is.null(s)) if (is.null(s$depth)) s$depth <- depth * s$pressure / mean(s$pressure[s$time >= 0 & s$time <= events["stop"]]) 
       if (!is.null(t)) if (is.null(t$depth)) t$depth <- depth * t$pressure / mean(t$pressure[t$time >= 0 & t$time <= events["stop"]]) 
-      
+      if (!is.null(s)) if (all(is.na(s$depth))) s$depth <- NULL
+      if (!is.null(t)) if (all(is.na(t$depth))) t$depth <- NULL
+                  
       # Create new graphics device:
       if (pdf){
          file <- paste0(path, "/", x$tow.id, ".pdf")
@@ -141,7 +147,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       layout(L)
 
       # Display catch photo:
-      photo <- gulf.utils::locate(keywords = c(year, "photos"), pattern = paste0(x$tow.id, ".jpg"))
+      photo <- gulf.utils::locate(keywords = c(year, "photos"), file = paste0(x$tow.id, ".jpg"))
       if (length(photo) == 1){
          photo <- jpeg::readJPEG(photo, native = FALSE)
          par(mar = c(0, 0, 0, 0))
@@ -163,7 +169,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       plot(c(-66.5, -60), c(45.25, 49.25), type = "n", xlab = "", ylab = "",
            cex.axis = 0.75, mgp = c(2, 0.5, 0), xaxs = "i", yaxs = "i")
       grid()
-      coast("i")
+      coast(res = "i")
       points(gulf.spatial::lon(x), gulf.spatial::lat(x), pch = 21, bg = "tomato2", cex = 1.25)
       box()
       
@@ -258,16 +264,16 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       
       # Depth profiles:
       depth <- NULL
-      if (is.null(depth)) if (!is.null(s)) depth <- max(s$depth[s$time >= 0 & s$time <= events["liftoff"]], na.rm = TRUE)
-      if (is.null(depth)) if (!is.null(t)) depth <- max(t$depth[t$time >= 0 & t$time <= events["liftoff"]], na.rm = TRUE)   
+      if (is.null(depth)) if (!is.null(s$depth)) depth <- max(s$depth[s$time >= 0 & s$time <= events["liftoff"]], na.rm = TRUE)
+      if (is.null(depth)) if (!is.null(t$depth)) depth <- max(t$depth[t$time >= 0 & t$time <= events["liftoff"]], na.rm = TRUE)   
       if (is.null(depth)) if (!is.null(e)) depth <- mean(e$depth[t$time >= 0 & e$time <= events["liftoff"]], na.rm = TRUE) 
-      if (is.null(depth)) if (!is.null(e)) depth <- gulf.spatial::depth(gulf.spatial::lon(x), gulf.spatial::lat(x))   
+      if (is.null(depth)) if (!is.null(e)) depth <- gulf.spatial::depth(gulf.spatial::lon(x), gulf.spatial::lat(x))  
       ylim <- c(-depth - 10, -depth + 30)
       ylim <- c(floor(ylim[1] / 5) * 5, floor((ylim[2] / 5)+1)* 5)
       plot(xlim, ylim, type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n", yaxt = "n")
       background(xlim, events)
-      if (!is.null(s)) lines(s$time, -s$depth, lwd = 2, col = "tomato2")
-      if (!is.null(t)) lines(t$time, -t$depth, lwd = 2, col = "skyblue3")
+      if (!is.null(s)) if (!is.null(s$depth)) lines(s$time, -s$depth, lwd = 2, col = "tomato2")
+      if (!is.null(t)) if (!is.null(t$depth)) lines(t$time, -t$depth, lwd = 2, col = "skyblue3")
       if (!is.null(e)) points(e$time, -e$depth, pch = 21, bg = "darkolivegreen3")
       mtext("Depth(m)", 2, 2.25, cex  = 0.7)
       at <- pretty(ylim)
