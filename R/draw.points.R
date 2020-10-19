@@ -1,8 +1,14 @@
+#' Draw Graphics Objects 
+#' 
+#' 
+
+
+#' @describeIn draw Draw a points interactively on a plot.
+#' @export draw.points
 draw.points <- function(x = NULL, y = NULL, n = NULL, tol = 5E-3, snap = FALSE,
                         snap.to.grid = FALSE, snap.to.line = FALSE, grid.increment,
                         grid.offset = 0, pch = 21, bg = "black", ...){
-   # DRAW.POINTS - Draw a points interactively on a plot.
-
+   
    # Points supplied by user:
    flag <- FALSE
    if (!missing(x) & !missing(y)){
@@ -133,3 +139,5 @@ draw.points <- function(x = NULL, y = NULL, n = NULL, tol = 5E-3, snap = FALSE,
 
    return(data.frame(x = xx, y = yy))
 }
+
+

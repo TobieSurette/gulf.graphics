@@ -1,25 +1,10 @@
-#' Export data frame to Excel
+#' Boxplot
 #'
-#' This function dumps a data frame into a temporary tab-delimited table and opens an Excel session for the file.
+#' @description Draws a boxplot based on input data.
 #'
-#' @aliases excel excel.default excel.data.frame
 #'
-#' @param x Data frame.
-#' @param header Logical value specifying whether data frame column names should be exported.
-#' @param row.names Logical value specifying whether data frame row names should be exported.
-#' @param Further arguments passed onto the \code{\link[utils]{write.table}} function.
-#'
-#' @examples
-#'
-#' # Send a vector to Excel:
-#' excel(1:10)
-#'
-#' # Send a 25 x 4 matrix of random numbers to Excel, with no headers:
-#' x <- matrix(runif(100), ncol = 4)
-#' excel(x, header = FALSE)
-#'
+
 #' @export gboxplot
-#'
 gboxplot <- function(y, x, labels, width = 0.5, xlab = "", ylab = "", alpha = 0.05,
                      lwd = 1, col = "black", bg = "white", ...){
 
@@ -62,7 +47,7 @@ gboxplot <- function(y, x, labels, width = 0.5, xlab = "", ylab = "", alpha = 0.
     n <- length(x)
 
     # Create empty plot:
-    plot(xlim, ylim, type = "n", xaxt = "n", xlab = xlab, ylab = ylab, ...)
+    graphics::plot(xlim, ylim, type = "n", xaxt = "n", xlab = xlab, ylab = ylab, ...)
 
     # Label axes:
     if (!is.null(labels)) axis(1, at = x, labels = labels, las = las, ...)
@@ -78,22 +63,22 @@ gboxplot <- function(y, x, labels, width = 0.5, xlab = "", ylab = "", alpha = 0.
         # Upper quartile box:
         xx <- c(x[i]-w, x[i]-w, x[i]+w, x[i]+w, x[i]-w)
         yy <- c(med[i], uq[i], uq[i], med[i], med[i])
-        polygon(xx, yy, lwd = lwd, col = background, ...)
+        graphics::polygon(xx, yy, lwd = lwd, col = background, ...)
 
         # Lower quartile box:
         xx <- c(x[i]-w, x[i]-w, x[i]+w, x[i]+w, x[i]-w)
         yy <- c(med[i], lq[i], lq[i], med[i], med[i])
-        polygon(xx, yy, lwd = lwd, col = background, ...)
+        graphics::polygon(xx, yy, lwd = lwd, col = background, ...)
 
         # Draw median line:
-        lines(c(x[i]-w, x[i]+w), c(med[i], med[i]), lwd = (lwd + 1), col = color)
+        graphics::lines(c(x[i]-w, x[i]+w), c(med[i], med[i]), lwd = (lwd + 1), col = color)
 
         # Upper whisker line:
-        lines(c(x[i], x[i]), c(uq[i], ui[i]), lty = "dashed", lwd = lwd, col = color)
-        lines(c(x[i]-w/2, x[i]+w/2), c(ui[i], ui[i]), lwd = lwd, col = color)
+        graphics::lines(c(x[i], x[i]), c(uq[i], ui[i]), lty = "dashed", lwd = lwd, col = color)
+        graphics::lines(c(x[i]-w/2, x[i]+w/2), c(ui[i], ui[i]), lwd = lwd, col = color)
 
         # Lower whisker line:
-        lines(c(x[i], x[i]), c(lq[i], li[i]), lty = "dashed", lwd = lwd, col = color)
-        lines(c(x[i]-w/2, x[i]+w/2), c(li[i], li[i]), lwd = lwd, col = color)
+        graphics::lines(c(x[i], x[i]), c(lq[i], li[i]), lty = "dashed", lwd = lwd, col = color)
+        graphics::lines(c(x[i]-w/2, x[i]+w/2), c(li[i], li[i]), lwd = lwd, col = color)
     }
 }

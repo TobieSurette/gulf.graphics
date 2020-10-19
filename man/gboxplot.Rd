@@ -2,10 +2,7 @@
 % Please edit documentation in R/gboxplot.R
 \name{gboxplot}
 \alias{gboxplot}
-\alias{excel}
-\alias{excel.default}
-\alias{excel.data.frame}
-\title{Export data frame to Excel}
+\title{Boxplot}
 \usage{
 gboxplot(
   y,
@@ -21,25 +18,6 @@ gboxplot(
   ...
 )
 }
-\arguments{
-\item{x}{Data frame.}
-
-\item{header}{Logical value specifying whether data frame column names should be exported.}
-
-\item{row.names}{Logical value specifying whether data frame row names should be exported.}
-
-\item{Further}{arguments passed onto the \code{\link[utils]{write.table}} function.}
-}
 \description{
-This function dumps a data frame into a temporary tab-delimited table and opens an Excel session for the file.
-}
-\examples{
-
-# Send a vector to Excel:
-excel(1:10)
-
-# Send a 25 x 4 matrix of random numbers to Excel, with no headers:
-x <- matrix(runif(100), ncol = 4)
-excel(x, header = FALSE)
-
+Draws a boxplot based on input data.
 }
