@@ -248,6 +248,8 @@ in.polygon <- function(p, x, y, ...){
       }
    }
 
+   dim(index) <- dim(x)
+   
    return(index)
 }
 
