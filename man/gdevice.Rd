@@ -21,5 +21,4 @@ gdevice("pdf", "Test.pdf")
 gdevice() # Equivalent to 'dev.new()'.
 plot(runif(100), runif(100))
 dev.off()
-
 }
