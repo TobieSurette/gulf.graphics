@@ -11,12 +11,11 @@
 #' gdevice() # Equivalent to 'dev.new()'.
 #' plot(runif(100), runif(100))
 #' dev.off()
-#'
 
 #' @export
 gdevice <- function(type = "", file, width = 8.5, height = 8.5){
    if (missing(file)) type <- ""
-   if (type == "jpeg") jpeg(file = file, width = width * 480, height = height * 480, res = 8.5 * 75)
-   if (type == "pdf")  pdf(file = file, width = width, height = height)
+   if (type == "jpeg") jpeg(file = paste0(file, ".jpg"), width = width * 480, height = height * 480, res = 8.5 * 75)
+   if (type == "pdf")  pdf(file = paste0(file, ".pdf"), width = width, height = height)
    if (type == "")     dev.new(width = width, height = height)
 }
