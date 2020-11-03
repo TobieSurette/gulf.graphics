@@ -4,7 +4,7 @@
 \alias{gdevice}
 \title{Prepare Graphics Device}
 \usage{
-gdevice(type = "", file, width = 8.5, height = 8.5)
+gdevice(type = "", file, width = 8.5, height = 8.5, layout, ...)
 }
 \arguments{
 \item{type}{Character string specifying the type of graphics device to be created (e.g. 'pdf', 'jpg', ...).}
@@ -12,6 +12,8 @@ gdevice(type = "", file, width = 8.5, height = 8.5)
 \item{file}{File name, excluding file extension suffix.}
 
 \item{width, height}{Dimensions in inches.}
+
+\item{layout}{Specify plot layout of graphics device.}
 }
 \description{
 A wrapper function to prepare a graphics device for output.
