@@ -26,6 +26,8 @@
 #' @param border Border colour(s) of the bars.
 #'
 #' @param add A logical value specifying if bars should be added to an existing plot. The default is \code{FALSE}.
+#' 
+#' @param grid Logical value specifying whether to draw a grid.
 #'
 #' @param yaxs A character value specifying how to set the limits of the Y axis, see \code{\link[graphics]{par}}.
 #'
@@ -62,10 +64,8 @@
 #' @export gbarplot
 #' @seealso \code{\link{error.bar}}
 #' 
-gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8,
-                     col = NULL, border = par("fg"), add = FALSE,
-                     yaxs = ifelse(all(y[!is.na(y)] <= 0)|all(y[!is.na(y)] >= 0), "i", "r"),
-                     legend = TRUE, ...){
+gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8, col = NULL, border = par("fg"), add = FALSE, grid = FALSE,
+                     yaxs = ifelse(all(y[!is.na(y)] <= 0)|all(y[!is.na(y)] >= 0), "i", "r"), legend = TRUE, ...){
 
    # Parse 'y' argument:
    if (is.table(y)){
@@ -79,12 +79,8 @@ gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8,
    if (nrow(y) == 1) y <- t(y)
 
    # Define 'col' argument:
-   if ((length(col) != dim(y)[1]) & (length(col) != dim(y)[2])){
-      if (dim(y)[2] == 1){
-         col = "grey"
-      }else{
-         col = grey(seq(0, 1, len = dim(y)[2]))
-      }
+   if ((length(col) != dim(y)[1]) & (length(col) != ncol(y))){
+      if (ncol(y) == 1) col = "grey" else col = grey(seq(0, 1, len = dim(y)[2]))
    }
 
    # Parse 'border' argument:
@@ -93,7 +89,7 @@ gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8,
    # Define 'x' as an integer sequence if undefined:
    if (is.null(x) | (length(x) == 0)){
       x <- as.numeric(rownames(y))
-      if (any(is.na(x))) x <- 1:dim(y)[1]
+      if (any(is.na(x))) x <- 1:nrow(y)
    }
 
    # Define 'labels' as an integer sequence if undefined:
@@ -135,11 +131,11 @@ gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8,
       plot(c(min(x) - width/2, max(x) + width/2), ylim, type = "n", ann = FALSE, xaxt = "n", yaxs = yaxs, ...)
       if (all(as.character(x) == labels)) axis(1, ...)
       else axis(1, at = x, labels = labels, ...)
+      if (grid) grid()
    }
 
    # Plot figure title:
    title(...)
- 
    
    # Loop over each bar:
    for (i in 1:length(x)){
@@ -170,9 +166,7 @@ gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8,
    }
 
    # Draw legend:
-   if (legend & (dim(y)[2] > 1)){
-      legend("topleft", fill = col, legend = names(y))
-   }
+   if (legend & (ncol(y) > 1)) legend("topleft", fill = col, legend = names(y))
 
    invisible(col)
 }
