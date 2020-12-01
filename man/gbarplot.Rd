@@ -12,6 +12,7 @@ gbarplot(
   col = NULL,
   border = par("fg"),
   add = FALSE,
+  grid = FALSE,
   yaxs = ifelse(all(y[!is.na(y)] <= 0) | all(y[!is.na(y)] >= 0), "i", "r"),
   legend = TRUE,
   ...
@@ -38,6 +39,8 @@ and \code{col} is unspecified, then colours are interpolated from a grayscale pa
 \item{border}{Border colour(s) of the bars.}
 
 \item{add}{A logical value specifying if bars should be added to an existing plot. The default is \code{FALSE}.}
+
+\item{grid}{Logical value specifying whether to draw a grid.}
 
 \item{yaxs}{A character value specifying how to set the limits of the Y axis, see \code{\link[graphics]{par}}.}
 
