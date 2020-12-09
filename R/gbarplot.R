@@ -64,8 +64,9 @@
 #' @export gbarplot
 #' @seealso \code{\link{error.bar}}
 #' 
-gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8, col = NULL, border = par("fg"), add = FALSE, grid = FALSE,
-                     yaxs = ifelse(all(y[!is.na(y)] <= 0)|all(y[!is.na(y)] >= 0), "i", "r"), legend = TRUE, ...){
+gbarplot <- function(y, x = NULL, labels, width = 1, col = NULL, border = "grey50", add = FALSE, 
+                     grid = FALSE, yaxs = ifelse(all(y[!is.na(y)] <= 0)|all(y[!is.na(y)] >= 0), "i", "r"), 
+                     legend = TRUE, ...){
 
    # Parse 'y' argument:
    if (is.table(y)){
@@ -93,7 +94,7 @@ gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8, col = NULL, border
    }
 
    # Define 'labels' as an integer sequence if undefined:
-   if (is.null(labels)) if (!is.null(x)) labels <- as.character(x) else labels <- rownames(y)
+   if (missing(labels)) if (!is.null(x)) labels <- as.character(x) else labels <- rownames(y)
 
    # If 'x' is a character vector, define 'labels' as 'x':
    if (is.character(x)){
@@ -112,7 +113,14 @@ gbarplot <- function(y, x = NULL, labels = NULL, width = 0.8, col = NULL, border
    x <- x[index]
    y <- y[index, , drop = FALSE]
    labels <- labels[index]
-
+   
+   # Modify bar width:
+   if (length(width == 1)){
+      tmp <- sort(unique(diff(x)))
+      tmp <- tmp[tmp > 0]
+      if (length(tmp) > 0) width <- width * tmp[1]
+   }
+   
    # Define y axis limits:
    ylim <- c(NA, NA)
    temp <- y

@@ -7,10 +7,10 @@
 gbarplot(
   y,
   x = NULL,
-  labels = NULL,
-  width = 0.8,
+  labels,
+  width = 1,
   col = NULL,
-  border = par("fg"),
+  border = "grey50",
   add = FALSE,
   grid = FALSE,
   yaxs = ifelse(all(y[!is.na(y)] <= 0) | all(y[!is.na(y)] >= 0), "i", "r"),
