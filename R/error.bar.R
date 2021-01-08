@@ -55,7 +55,6 @@ error.bar <- function(x, y, sigma, lower, upper, add = TRUE, ...){
    
    # Draw error bars:
    w <- 0.15 * (length(x) / diff(par("usr")[1:2]))
-   print(r)
    for (i in 1:nrow(r)){
       lines(rep(x[i], 2), c(r$lower[i], r$upper[i]), ...)
       lines(c(x[i]-w, x[i]+w), rep(r$lower[i], 2), ...)
