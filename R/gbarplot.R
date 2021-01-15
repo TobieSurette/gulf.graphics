@@ -64,7 +64,7 @@
 #' @export gbarplot
 #' @seealso \code{\link{error.bar}}
 #' 
-gbarplot <- function(y, x = NULL, labels, width = 1, col = NULL, border = "grey50", add = FALSE, 
+gbarplot <- function(y, x = NULL, labels, width = 1, col = "grey", border = "grey50", add = FALSE, 
                      grid = FALSE, yaxs = ifelse(all(y[!is.na(y)] <= 0)|all(y[!is.na(y)] >= 0), "i", "r"), 
                      legend = TRUE, ...){
 
@@ -79,14 +79,12 @@ gbarplot <- function(y, x = NULL, labels, width = 1, col = NULL, border = "grey5
    if (!is.data.frame(y)) y <- as.data.frame(y)
    if (nrow(y) == 1) y <- t(y)
 
-   # Define 'col' argument:
-   if ((length(col) != dim(y)[1]) & (length(col) != ncol(y))){
-      if (ncol(y) == 1) col = "grey" else col = grey(seq(0, 1, len = dim(y)[2]))
-   }
-
-   # Parse 'border' argument:
-   if (length(border) == 1) border <- rep(border, length(col))
-
+   # Define bar colours:
+   if ((length(col) == 1) & (ncol(y) == 1))    col <- rep(col, nrow(y))
+   if ((length(col) == 1) & (ncol(y) > 1))     col <- rep(col, ncol(y))
+   if ((length(border) == 1) & (ncol(y) == 1)) border <- rep(border, nrow(y))
+   if ((length(border) == 1) & (ncol(y) > 1))  border <- rep(border, ncol(y))
+   
    # Define 'x' as an integer sequence if undefined:
    if (is.null(x) | (length(x) == 0)){
       x <- as.numeric(rownames(y))
@@ -144,7 +142,7 @@ gbarplot <- function(y, x = NULL, labels, width = 1, col = NULL, border = "grey5
 
    # Plot figure title:
    title(...)
-   
+
    # Loop over each bar:
    for (i in 1:length(x)){
       y.lower <- 0
@@ -156,7 +154,7 @@ gbarplot <- function(y, x = NULL, labels, width = 1, col = NULL, border = "grey5
          for (j in 1:length(index)){
             xx <- c(x[i] - width / 2, x[i] - width / 2, x[i] + width / 2, x[i] + width / 2, x[i] - width / 2)
             yy <- c(y.lower, y.lower + y[i, index[j]], y.lower + y[i, index[j]], y.lower, y.lower)
-            polygon(xx, yy, col = col[index[j]], border = border[index[j]], ...)
+            polygon(xx, yy, col = col[i], border = border[i], ...)
             y.lower <- y.lower + y[i, index[j]]
          }
       }
@@ -167,7 +165,7 @@ gbarplot <- function(y, x = NULL, labels, width = 1, col = NULL, border = "grey5
          for (j in 1:length(index)){
             xx <- c(x[i] - width / 2, x[i] - width / 2, x[i] + width / 2, x[i] + width / 2, x[i] - width / 2)
             yy <- c(y.upper, y.upper + y[i, index[j]], y.upper + y[i, index[j]], y.upper, y.upper)
-            polygon(xx, yy, col = col[index[j]], border = border[index[j]], ...)
+            polygon(xx, yy, col = col[i], border = border[i], ...)
             y.upper <- y.upper + y[i, index[j]]
          }
       }
