@@ -64,7 +64,7 @@
 #' @export gbarplot
 #' @seealso \code{\link{error.bar}}
 #' 
-gbarplot <- function(y, x = NULL, labels, width = 1, col = "grey", border = "grey50", add = FALSE, 
+gbarplot <- function(y, x, labels, width = 1, col = "grey", border = "grey50", add = FALSE, 
                      grid = FALSE, yaxs = ifelse(all(y[!is.na(y)] <= 0)|all(y[!is.na(y)] >= 0), "i", "r"), 
                      legend = TRUE, ...){
 
@@ -80,13 +80,16 @@ gbarplot <- function(y, x = NULL, labels, width = 1, col = "grey", border = "gre
    if (nrow(y) == 1) y <- t(y)
 
    # Define bar colours:
-   if ((length(col) == 1) & (ncol(y) == 1))    col <- rep(col, nrow(y))
-   if ((length(col) == 1) & (ncol(y) > 1))     col <- rep(col, ncol(y))
-   if ((length(border) == 1) & (ncol(y) == 1)) border <- rep(border, nrow(y))
-   if ((length(border) == 1) & (ncol(y) > 1))  border <- rep(border, ncol(y))
+   if (length(col) == 1)       col <- colorRampPalette(c("white", col))(ncol(y))
+   if (length(col) == ncol(y)) col <- gulf.utils::repvec(col, nrow = nrow(y))
+   if (length(border) == 1)       border <- colorRampPalette(c("white", border))(ncol(y))
+   if (length(border) == ncol(y)) border <- gulf.utils::repvec(border, nrow = nrow(y))
+   
+   print(col)
+   print(border)
    
    # Define 'x' as an integer sequence if undefined:
-   if (is.null(x) | (length(x) == 0)){
+   if (missing(x)){
       x <- as.numeric(rownames(y))
       if (any(is.na(x))) x <- 1:nrow(y)
    }
@@ -107,13 +110,15 @@ gbarplot <- function(y, x = NULL, labels, width = 1, col = "grey", border = "gre
    if (length(x) != length(labels)) stop("'x' and 'labels' must be the same length.")
 
    # Order data by values of 'x':
-   index <- order(x)
-   x <- x[index]
-   y <- y[index, , drop = FALSE]
-   labels <- labels[index]
+   ix<- order(x)
+   x <- x[ix]
+   y <- y[ix, , drop = FALSE]
+   labels <- labels[ix]
+   col <- col[ix, , drop = FALSE]
+   border <- border[ix, , drop = FALSE]
    
    # Modify bar width:
-   if (length(width == 1)){
+   if (length(width) == 1){
       tmp <- sort(unique(diff(x)))
       tmp <- tmp[tmp > 0]
       if (length(tmp) > 0) width <- width * tmp[1]
@@ -139,7 +144,7 @@ gbarplot <- function(y, x = NULL, labels, width = 1, col = "grey", border = "gre
       else axis(1, at = x, labels = labels, ...)
       if (grid) grid()
    }
-
+   
    # Plot figure title:
    title(...)
 
@@ -154,7 +159,7 @@ gbarplot <- function(y, x = NULL, labels, width = 1, col = "grey", border = "gre
          for (j in 1:length(index)){
             xx <- c(x[i] - width / 2, x[i] - width / 2, x[i] + width / 2, x[i] + width / 2, x[i] - width / 2)
             yy <- c(y.lower, y.lower + y[i, index[j]], y.lower + y[i, index[j]], y.lower, y.lower)
-            polygon(xx, yy, col = col[i], border = border[i], ...)
+            polygon(xx, yy, col = col[i, index[j]], border = border[i, index[j]], ...)
             y.lower <- y.lower + y[i, index[j]]
          }
       }
@@ -165,7 +170,7 @@ gbarplot <- function(y, x = NULL, labels, width = 1, col = "grey", border = "gre
          for (j in 1:length(index)){
             xx <- c(x[i] - width / 2, x[i] - width / 2, x[i] + width / 2, x[i] + width / 2, x[i] - width / 2)
             yy <- c(y.upper, y.upper + y[i, index[j]], y.upper + y[i, index[j]], y.upper, y.upper)
-            polygon(xx, yy, col = col[i], border = border[i], ...)
+            polygon(xx, yy, col = col[i, index[j]], border = border[i, index[j]], ...)
             y.upper <- y.upper + y[i, index[j]]
          }
       }
