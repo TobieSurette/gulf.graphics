@@ -85,9 +85,6 @@ gbarplot <- function(y, x, labels, width = 1, col = "grey", border = "grey50", a
    if (length(border) == 1)       border <- colorRampPalette(c("white", border))(ncol(y))
    if (length(border) == ncol(y)) border <- gulf.utils::repvec(border, nrow = nrow(y))
    
-   print(col)
-   print(border)
-   
    # Define 'x' as an integer sequence if undefined:
    if (missing(x)){
       x <- as.numeric(rownames(y))
