@@ -6,7 +6,7 @@
 \usage{
 gbarplot(
   y,
-  x = NULL,
+  x,
   labels,
   width = 1,
   col = "grey",
