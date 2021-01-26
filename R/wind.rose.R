@@ -20,7 +20,7 @@
 #' map()
 #' wind.rose()
 
-#' @export
+#' @export wind.rose
 wind.rose <- function(longitude, latitude, radius = 0.3, pos = 3, bearing = 0, 
                       units = "inches", margin = 0.04, convert = TRUE, cex = 0.6, ...){
 

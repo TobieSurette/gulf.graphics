@@ -22,7 +22,7 @@
 #' map("coast")    # Plot empty map.
 #' scale.bar()
 #'
-#' @export
+#' @export scale.bar
 scale.bar <- function(longitude, latitude, length = 100, units = "km", convert = TRUE, number = 4, double = TRUE,
                       thickness = 0.05, pos = 1 , margin = 0.25, cex = 0.6, colours = "black", ...){
    
