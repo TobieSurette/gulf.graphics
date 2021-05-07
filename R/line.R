@@ -23,9 +23,6 @@ hline <- function(x, lower, upper, label, at, ...){
    if (missing(lower)) lower <- graphics::par("usr")[1]
    if (missing(upper)) upper <- graphics::par("usr")[2]
 
-   # Remove lines which are not in the plot region:
-   x <- x[(x >= graphics::par("usr")[3]) & (x <= graphics::par("usr")[4])]
-
    # Check argument sizes and draw lines:
    if (length(x) > 0){
       if (length(lower) == 1) lower <- rep(lower, length(x))
@@ -51,9 +48,6 @@ vline <- function(x, lower, upper, label, at, ...){
    # Define default line bounds:
    if (missing(lower)) lower <- graphics::par("usr")[3]
    if (missing(upper)) upper <- graphics::par("usr")[4]
-
-   # Remove lines which are not in the plot region:
-   x <- x[(x >= graphics::par("usr")[1]) & (x <= graphics::par("usr")[2])]
 
    # Check argument sizes and draw lines:
    if (length(x) > 0){
