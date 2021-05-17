@@ -80,11 +80,11 @@ gbarplot <- function(y, x, labels, width = 1, col = "grey", border = "grey50", a
    if (nrow(y) == 1) y <- t(y)
 
    # Define bar colours:
-   if (length(col) == 1)          col <- colorRampPalette(c("grey80", col))(ncol(y))
    if (length(col) == ncol(y))    col <- gulf.utils::repvec(col, nrow = nrow(y))
-   if (length(border) == 1)       border <- colorRampPalette(c("grey70", border))(ncol(y))
+   if (length(col) == 1)          col <- colorRampPalette(c("grey80", col))(ncol(y))
    if (length(border) == ncol(y)) border <- gulf.utils::repvec(border, nrow = nrow(y))
-   
+   if (length(border) == 1)       border <- colorRampPalette(c("grey70", border))(ncol(y))
+
    # Define 'x' as an integer sequence if undefined:
    if (missing(x)){
       x <- as.numeric(rownames(y))
