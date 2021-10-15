@@ -22,7 +22,7 @@
 #' @export
 plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperature = FALSE, headline = TRUE, 
                         wingspread = TRUE, tilt = TRUE, ...){
-   # 1 - Photo and maps (compare vessel and trawl footrope probe heading)
+   # 1 - Photo and maps (compare vessel and trawl foot rope probe heading)
    # 2 - Vessel speed
    # 3 - Depth profiles
    # 4 - Wingspread profiles
@@ -33,10 +33,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
    # 9 - Accelerometer profiles
    
    # Load tow data:
-   if (missing(x)){
-      if (missing(tow.id) | missing(year)) stop("'tow.id' and 'year' must be specified.")
-      x <- read.scsset(year = 2020, tow.id = tow.id)
-   }
+   if (missing(x)) if (missing(tow.id) | missing(year)) stop("'tow.id' and 'year' must be specified.")
 
    # Date labeling function:
    suffix <- function(n){
@@ -57,12 +54,14 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       # Read probe data:
       m <- NULL
       e <- read.esonar(x)
-      s <- read.star.oddi(x, probe = "headline", project = "scs")
-      t <- read.star.oddi(x, probe = "footrope", project = "scs")
+      s <- read.star.oddi(x, location = "headline", project = "scs")
+      t <- read.star.oddi(x, location = "footrope", project = "scs")
 
       # Define reference time:
       reftime <- gulf.utils::time(x, "touchdown")
-
+      tmp <- read.event(year, event = "touchdown", location = "footrope")
+      match(tmp[c("date", "tow.id")], x[c("date", "tow.id")])
+         
       # Define set of event times:
       events <- c(start = gulf.utils::time(x, "start"), 
                   stop = gulf.utils::time(x, "end"),
@@ -122,6 +121,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       if (pdf){
          file <- paste0(path, "/", x$tow.id, ".pdf")
          pdf(width = 8.5, height = 11, file = file)
+         print(file)
       }else{
          dev.new(width = 8.5, height = 11)
       }
@@ -147,7 +147,8 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       layout(L)
 
       # Display catch photo:
-      photo <- gulf.utils::locate(keywords = c(year, "photos"), file = paste0(x$tow.id, ".jpg"))
+      photo <- gulf.utils::locate(path = "/Users/crustacean/Desktop/gulf.photos", 
+                                  keywords = c(year), file = paste0(x$tow.id, ".jpg"))
       if (length(photo) == 1){
          photo <- jpeg::readJPEG(photo, native = FALSE)
          par(mar = c(0, 0, 0, 0))
@@ -169,7 +170,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       plot(c(-66.5, -60), c(45.25, 49.25), type = "n", xlab = "", ylab = "",
            cex.axis = 0.75, mgp = c(2, 0.5, 0), xaxs = "i", yaxs = "i")
       grid()
-      coast(res = "i")
+      gulf.spatial::map("coast")
       points(gulf.spatial::lon(x), gulf.spatial::lat(x), pch = 21, bg = "tomato2", cex = 1.25)
       box()
       
@@ -178,7 +179,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       day <- as.numeric(substr(x$date, 9, 10))
       title <- paste0(title, day, suffix(day), ", ", year, ": ")
       title <- paste0(title, "Tow #", x$tow.number)
-      title <- paste0(title, " (station = ", x$tow.id, ")")
+      title <- paste0(title, " (id = '", x$tow.id, "')")
       mtext(title, 3, 1.3, at = par("usr")[1] + 0.5*diff(par("usr")[1:2]), cex = 1.25, font = 2)
 
       if (!is.null(e)){
@@ -302,14 +303,14 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       
       if (tilt){
          # Tilt angle plot:
-         index <- t$time >= xlim[1] & t$time <= xlim[2]
-         ylim <- range(t[index, c("tilt-x", "tilt-y", "tilt-z")], na.rm = TRUE)
+         ix <- t$time >= xlim[1] & t$time <= xlim[2]
+         ylim <- range(t[ix, c("tilt.x", "tilt.y", "tilt.z")], na.rm = TRUE)
          ylim <- c(floor(ylim[1] / 10) * 10, (floor(ylim[2] / 10)+1) * 10)
          plot(xlim, ylim, type = "n", xaxs = "i", yaxs = "i", xlab = "", ylab = "", xaxt = "n")
          background(xlim, events)
-         lines(t$time, t$"tilt-z", col = "darkolivegreen3", lwd = 1.5)
-         lines(t$time, t$"tilt-y", col = "tomato2", lwd = 1.5)
-         lines(t$time, t$"tilt-x", col = "skyblue3", lwd = 1.5)
+         lines(t$time, t$tilt.z, col = "darkolivegreen3", lwd = 1.5)
+         lines(t$time, t$tilt.y, col = "tomato2", lwd = 1.5)
+         lines(t$time, t$tilt.x, col = "skyblue3", lwd = 1.5)
          mtext("Tilt angle(º)", 2, 2.25, cex  = 0.7)
          box()
          legend("topright",
