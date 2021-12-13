@@ -64,7 +64,7 @@
 #' @export gbarplot
 #' @seealso \code{\link{error.bar}}
 #' 
-gbarplot <- function(y, x, labels, width = 1, col = "grey", border = "grey50", add = FALSE, 
+gbarplot <- function(y, x, labels, width = 1, col = "grey70", border = "grey50", add = FALSE, 
                      grid = FALSE, yaxs = ifelse(all(y[!is.na(y)] <= 0)|all(y[!is.na(y)] >= 0), "i", "r"), 
                      legend = TRUE, ...){
 
