@@ -59,9 +59,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
 
       # Define reference time:
       reftime <- gulf.utils::time(x, "touchdown")
-      tmp <- read.event(year, event = "touchdown", location = "footrope")
-      match(tmp[c("date", "tow.id")], x[c("date", "tow.id")])
-         
+
       # Define set of event times:
       events <- c(start = gulf.utils::time(x, "start"), 
                   stop = gulf.utils::time(x, "end"),
@@ -147,7 +145,7 @@ plot.scsset <- function(x, tow.id, year, pdf = FALSE, path = getwd(), temperatur
       layout(L)
 
       # Display catch photo:
-      photo <- gulf.utils::locate(path = "/Users/crustacean/Desktop/gulf.photos", 
+      photo <- gulf.utils::locate(path = paste0(options()$gulf.path$snow.crab$survey, "Fishing Year ", year, "/Trawl Survey/photos"), 
                                   keywords = c(year), file = paste0(x$tow.id, ".jpg"))
       if (length(photo) == 1){
          photo <- jpeg::readJPEG(photo, native = FALSE)
