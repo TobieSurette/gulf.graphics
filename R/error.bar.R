@@ -1,4 +1,4 @@
-#' Draw Error Bars
+#' @title Draw Error Bars
 #' 
 #' @description Draw error bars with specified error levels at the specified coordinates.
 #' 
@@ -22,7 +22,8 @@
 #' 
 #' @export error.bar
 #' 
-error.bar <- function(x, y, sigma, lower, upper, add = TRUE, ...){
+
+error.bar <- function(x, y, sigma, lower, upper, polygon = FALSE, col = "grey30", border, add = TRUE, ...){
    # Parse input arguments:
    if (!is.null(dim(x))) x <- as.vector(x)
    if (!missing(y)){
@@ -46,6 +47,7 @@ error.bar <- function(x, y, sigma, lower, upper, add = TRUE, ...){
    if (length(lower) == 1) lower <- rep(lower, length(x))
    if (!missing(lower) & !missing(upper)) r <- data.frame(lower = lower, upper = upper)
    if (missing(lower) | missing(upper)) stop("Bounds for error bars are undefined.")
+   
    if (missing(x)) stop("Horizontal coordinates 'x' must be specified.")
    x <- as.vector(x)
    if (length(x) != nrow(r)) stop("'x' and error bounds have inconsistent sizes.")
@@ -54,10 +56,17 @@ error.bar <- function(x, y, sigma, lower, upper, add = TRUE, ...){
    if (!add | is.null(dev.list())) plot(range(x), c(min(r$lower), max(r$upper)), type = "n", xlab = "", ylab = "")
    
    # Draw error bars:
-   w <- 0.15 * (length(x) / diff(par("usr")[1:2]))
-   for (i in 1:nrow(r)){
-      lines(rep(x[i], 2), c(r$lower[i], r$upper[i]), ...)
-      lines(c(x[i]-w, x[i]+w), rep(r$lower[i], 2), ...)
-      lines(c(x[i]-w, x[i]+w), rep(r$upper[i], 2), ...)
+   if (!polygon){
+      # Draw error bars:
+      w <- 0.15 * (length(x) / diff(par("usr")[1:2]))
+      for (i in 1:nrow(r)){
+         lines(rep(x[i], 2), c(r$lower[i], r$upper[i]), ...)
+         lines(c(x[i]-w, x[i]+w), rep(r$lower[i], 2), ...)
+         lines(c(x[i]-w, x[i]+w), rep(r$upper[i], 2), ...)
+      }
+   }else{
+      # Draw polygon region:
+      if (missing(border)) border <- col
+      polygon(c(x, rev(x)), c(lower, rev(upper)), col = fade(col), border = border, ...)
    }
 }

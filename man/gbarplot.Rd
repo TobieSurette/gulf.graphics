@@ -9,7 +9,7 @@ gbarplot(
   x,
   labels,
   width = 1,
-  col = "grey",
+  col = "grey70",
   border = "grey50",
   add = FALSE,
   grid = FALSE,

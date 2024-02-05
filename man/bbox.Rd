@@ -17,11 +17,11 @@ Functions to calculate bounding box of an object.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Calculate the bounding box coordinates for a set of coordinate points.
+\item \code{bbox(default)}: Calculate the bounding box coordinates for a set of coordinate points.
 
-\item \code{polygon}: Calculate surface area of a polygon using its vertex coordinates.
+\item \code{bbox(polygon)}: Calculate surface area of a polygon using its vertex coordinates.
+
 }}
-
 \examples{
 x <- c(0, 0, 0.5, 1, 1, 0)
 y <- c(0, 1, 0.5, 1, 0, 0)

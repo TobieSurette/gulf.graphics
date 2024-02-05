@@ -63,10 +63,10 @@ Draw Graphics Objects
 }
 \section{Functions}{
 \itemize{
-\item \code{draw.points}: Draw a points interactively on a plot.
+\item \code{draw.points()}: Draw a points interactively on a plot.
 
-\item \code{draw.polygon}: Draw a polygon interactively on a plot.
+\item \code{draw.polygon()}: Draw a polygon interactively on a plot.
 
-\item \code{draw.points}: Draw a points interactively on a plot.
+\item \code{draw.points()}: Draw a points interactively on a plot.
+
 }}
-

@@ -4,7 +4,18 @@
 \alias{error.bar}
 \title{Draw Error Bars}
 \usage{
-error.bar(x, y, sigma, lower, upper, add = TRUE, ...)
+error.bar(
+  x,
+  y,
+  sigma,
+  lower,
+  upper,
+  polygon = FALSE,
+  col = "grey30",
+  border,
+  add = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{Horizontal coordinates.}

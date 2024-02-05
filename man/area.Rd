@@ -17,11 +17,11 @@ Functions to calculate surface area.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Calculate surface area of a polygon using its vertex coordinates.
+\item \code{area(default)}: Calculate surface area of a polygon using its vertex coordinates.
 
-\item \code{polygon}: Calculate the area of a \code{polygon} object.
+\item \code{area(polygon)}: Calculate the area of a \code{polygon} object.
+
 }}
-
 \examples{
 x <- c(0, 0, 0.5, 1, 1, 0)
 y <- c(0, 1, 0.5, 1, 0, 0)

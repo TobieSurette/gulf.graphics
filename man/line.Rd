@@ -27,11 +27,11 @@ These functions are used to draw horizontal or vertical lines on an existing plo
 }
 \section{Functions}{
 \itemize{
-\item \code{hline}: Draw horizontal lines.
+\item \code{hline()}: Draw horizontal lines.
 
-\item \code{vline}: Draw vertical lines.
+\item \code{vline()}: Draw vertical lines.
+
 }}
-
 \examples{
   plot(c(0, 10), c(0, 10), type = "n")
   hline(0, col = "red", lty = "solid")
