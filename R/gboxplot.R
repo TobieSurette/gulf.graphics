@@ -1,4 +1,4 @@
-#' Boxplot
+#' @title Boxplot
 #'
 #' @description Draws a boxplot based on input data.
 #'
@@ -8,21 +8,29 @@
 gboxplot <- function(y, x, labels, width = 0.5, xlab = "", ylab = "", alpha = 0.05,
                      lwd = 1, col = "black", bg = "white", ...){
 
-    # Check input arguments:
-    y <- as.matrix(y)
-    if (!all(dim(y) > 1)) stop("'y' must be a matrix.")
-    if ((length(alpha) != 1) | (alpha < 0) | (alpha > 1)) stop("'alpha' must be a numeric value between 0 and 1.")
-
-    # Calculate 'y' summary statistics:
-    med <- apply(y, 2, median)
-    lq <-  apply(y, 2, quantile, 0.25)
-    uq <-  apply(y, 2, quantile, 0.75)
-    li <-  apply(y, 2, quantile, alpha / 2)
-    ui <-  apply(y, 2, quantile, 1- alpha / 2)
-
+    if (is.data.frame(y)){
+       med <- y$median
+       lq <- y[, grep("val25", names(y))]
+       uq <- y[, grep("val75", names(y))]
+       li <-  y[, grep("val2.5", names(y), fixed = TRUE)]
+       ui <-  y[, grep("val97.5", names(y), fixed = TRUE)]
+    }else{
+       # Check input arguments:
+       y <- as.matrix(y)
+       if (!all(dim(y) > 1)) stop("'y' must be a matrix.")
+       if ((length(alpha) != 1) | (alpha < 0) | (alpha > 1)) stop("'alpha' must be a numeric value between 0 and 1.")
+       
+       # Calculate 'y' summary statistics:
+       med <- apply(y, 2, median)
+       lq <-  apply(y, 2, quantile, 0.25)
+       uq <-  apply(y, 2, quantile, 0.75)
+       li <-  apply(y, 2, quantile, alpha / 2)
+       ui <-  apply(y, 2, quantile, 1- alpha / 2)
+    }
+   
     # Determine "x" labels:
     if (missing(x)) if (!is.null(dimnames(y)[[2]])) x <- dimnames(y)[[2]] else x <- 1:dim(y)[2]
-    if (length(x) != dim(y)[2]) stop(paste("'x' must have", dim(y)[2], "elements."))
+    #if (length(x) != dim(y)[2]) stop(paste("'x' must have", dim(y)[2], "elements."))
 
     # Define plot intervals:
     if (is.numeric(x)){
