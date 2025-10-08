@@ -18,7 +18,7 @@ fade <- function(x, alpha = 0.5){
    }
    
    # Fade colours:
-   y["alpha", ] <- alpha * y["alpha", ]
+   y["alpha", ] <- as.numeric(alpha * y["alpha", ])
       
    # Convert RGB values to colours:
    y <- rgb(y["red",], y["green",], y["blue",], alpha = y["alpha", ])
